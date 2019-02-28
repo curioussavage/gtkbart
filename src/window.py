@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import requests
 
 from gi.repository import Gtk
 from gi.repository import Gio
@@ -30,8 +31,10 @@ class Station(GObject.GObject):
         self.name = station_dict.get('name')
         self.abbr = station_dict.get('abbr')
 
- 
+
+api_key='MW9S-E7SL-26DU-VV8V'
 estimate_url = 'http://api.bart.gov/api/etd.aspx?cmd=etd&orig={station}&key={api_key}&json=y'
+
 
 @GtkTemplate(ui='/org/gnome/Bartapp/window.ui')
 class BartappWindow(Gtk.ApplicationWindow):
@@ -42,32 +45,39 @@ class BartappWindow(Gtk.ApplicationWindow):
     station_list = GtkTemplate.Child()
     train_list = GtkTemplate.Child()
     
-    station_list_store = Gio.ListStore()
+    station_window = GtkTemplate.Child()
+    train_window = GtkTemplate.Child()
     
-    current_station = None
+    station_list_store = Gio.ListStore()
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.init_template()
         
         self.station_list.bind_model(self.station_list_store, self.make_station_widget)
-        self.station_list.connect('row_selected', self.handle_station_activated)
+        self.station_list.connect('row_activated', self.handle_station_activated)
         
         for station_dict in STATIONS:
             self.station_list_store.append(Station(station_dict))
             
+        self.back_button.connect('clicked', self.handle_back_btn_activate)
+
+    def handle_back_btn_activate(self, el):
+        self.stack.set_visible_child(self.station_window)
+        # maye clear the data from the line page here
+
+    def get_line_estimates(self, station):
+        url = estimate_url.format(api_key=api_key, station=station)
+        r = requests.get(ur)
+        response = r.json()
+
+
     def make_station_widget(self, data):
         return StationWidget(data) 
     
     def handle_station_activated(self, container, widget):
         abbr = widget.station.abbr 
-        if self.current_station == None:
-            self.curent_station = abbr
-            return
-        print(abbr)
-        
-        # request estimate data
-        # display stack
-        self.stack.set_visible_child(self.train_list)
-        self.back_button.visible = True
+        # request data
+        self.stack.set_visible_child(self.train_window)
+        self.back_button.show()
  
