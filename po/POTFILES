@@ -1,0 +1,7 @@
+data/org.gnome.Bartapp.desktop.in
+data/org.gnome.Bartapp.appdata.xml.in
+data/org.gnome.Bartapp.gschema.xml
+src/window.ui
+src/main.py
+src/window.py
+

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/gnome/Bartapp">
+    <file>window.ui</file>
+    <file>station.ui</file>
+    <file>line.ui</file>
+  </gresource>
+</gresources>

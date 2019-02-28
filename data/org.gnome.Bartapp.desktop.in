@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=bartapp
+Exec=bartapp
+Terminal=false
+Type=Application
+Categories=GTK;
+StartupNotify=true
