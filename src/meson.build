@@ -33,6 +33,7 @@ bartapp_sources = [
   'stations.py',
   'line.py',
   'station.py',
+  'platform_divider.py',
 ]
 
 install_data(bartapp_sources, install_dir: moduledir)

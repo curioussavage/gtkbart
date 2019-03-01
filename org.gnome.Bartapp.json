@@ -33,18 +33,6 @@
         "*.a"
     ],
     "modules": [
-        {
-            "name": "bartapp",
-            "buildsystem": "meson",
-            "config-opts": [ "--libdir=lib" ],
-            "builddir": true,
-            "sources": [
-                {
-                    "type": "git",
-                    "url": "file:///home/awinn/projects/bartapp"
-                }
-            ]
-        },
        {
 	    "name": "python3-requests",
 	    "buildsystem": "simple",
@@ -78,6 +66,18 @@
 		    "sha256": "c357b3f628cf53ae2c4c05627ecc484553142ca23264e593d327bcde5e9c3407"
 		}
 	    ]
-	}
+	},
+        {
+            "name": "bartapp",
+            "buildsystem": "meson",
+            "config-opts": [ "--libdir=lib" ],
+            "builddir": true,
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "file:///home/awinn/projects/bartapp"
+                }
+            ]
+        }
     ]
 }

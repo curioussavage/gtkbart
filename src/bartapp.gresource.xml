@@ -4,5 +4,6 @@
     <file>window.ui</file>
     <file>station.ui</file>
     <file>line.ui</file>
+    <file>platform_divider.ui</file>
   </gresource>
 </gresources>
