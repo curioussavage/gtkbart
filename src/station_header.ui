@@ -2,22 +2,19 @@
 <!-- Generated with glade 3.22.1 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <template class="PlatformDivider" parent="GtkListBoxRow">
+  <template class="StationHeader" parent="GtkListBoxRow">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="activatable">False</property>
     <property name="selectable">False</property>
     <child>
-      <object class="GtkLabel" id="platform_name">
+      <object class="GtkLabel" id="station_name">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="halign">start</property>
-        <property name="margin_left">5</property>
-        <property name="margin_right">5</property>
+        <property name="halign">center</property>
         <property name="margin_top">10</property>
-        <property name="margin_bottom">10</property>
         <property name="hexpand">True</property>
-        <property name="label" translatable="yes">name</property>
+        <property name="label" translatable="yes">name is really long here</property>
       </object>
     </child>
   </template>

@@ -11,4 +11,5 @@ class PlatformDivider(Gtk.ListBoxRow):
         super().__init__(**kwargs)
         self.init_template()
 
-        self.platform_name.set_text('Platform ' + number)
+        markup = '<span size="large"><b>{text}</b></span>'
+        self.platform_name.set_markup(markup.format(text='Platform ' + number))
