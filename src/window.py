@@ -163,7 +163,7 @@ class BartappWindow(Gtk.ApplicationWindow):
 
     def handle_back_btn_activate(self, el):
         self.stack.set_visible_child(self.station_window)
-        self.back_button.visibile = False
+        self.back_button.hide()
         self.train_list_store.remove_all()
 
     def fetch_estimate(self, station):
