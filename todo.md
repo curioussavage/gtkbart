@@ -1,3 +1,4 @@
 Change default window size
-write to favs to disk
 style the line rows
+cache responses (maybe limit requests to every 30 seconds)
+use the timestamp from server to try to keep estimates accurate
