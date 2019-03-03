@@ -1,6 +1,7 @@
 import requests
 import os
 from os import path
+from time import time
 
 from gi.repository import Gtk
 from gi.repository import Gdk
@@ -68,6 +69,14 @@ estimate_url = 'http://api.bart.gov/api/etd.aspx?cmd=etd&orig={station}&key={api
 @GtkTemplate(ui='/org/gnome/Bartapp/window.ui')
 class BartappWindow(Gtk.ApplicationWindow):
     __gtype_name__ = 'BartappWindow'
+
+    estimate_cache = {}
+    # {
+    # <abbrev>: {
+    #     timestamp: 1234233423,
+    #     data: <response here>
+    # }
+    # }
 
     favs = set()
 
@@ -157,14 +166,29 @@ class BartappWindow(Gtk.ApplicationWindow):
         self.back_button.visibile = False
         self.train_list_store.remove_all()
 
-    def get_line_estimates(self, station):
+    def fetch_estimate(self, station):
+        if station in self.estimate_cache and (time() - self.estimate_cache[station]['timestamp'] < 25):
+            return self.estimate_cache[station]['data']
+
         url = estimate_url.format(api_key=api_key, station=station)
         headers = {
             'User-Agent': 'gtkbart',
         }
         try:
             r = requests.get(url, headers=headers)
-            response = r.json().get('root')
+            res = r.json()
+            self.estimate_cache[station] = {
+                'timestamp': time(),
+                'data': res,
+            }
+            return res
+        except Exception as e:
+            print(e)
+
+    def get_line_estimates(self, station):
+        try:
+            r = self.fetch_estimate(station)
+            response = r.get('root')
 
             etd = response.get('station')[0].get('etd')
             platforms = {}
@@ -208,4 +232,3 @@ class BartappWindow(Gtk.ApplicationWindow):
         self.get_line_estimates(abbr)
         self.stack.set_visible_child(self.train_window)
         self.back_button.show()
- 
