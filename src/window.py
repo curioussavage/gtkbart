@@ -1,24 +1,11 @@
-# window.py
-#
-# Copyright 2019 curioussavage
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import requests
+import os
+from os import path
 
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import Gio
+from gi.repository import GLib
 from gi.repository import GObject
 from .gi_composites import GtkTemplate
 
@@ -30,10 +17,11 @@ from .station_header import StationHeader as StationHeaderWidget
 
 
 class Station(GObject.GObject):
-    def __init__(self, station_dict):
+    def __init__(self, station_dict, is_fav):
         GObject.GObject.__init__(self)
         self.name = station_dict.get('name')
         self.abbr = station_dict.get('abbr')
+        self.is_fav = is_fav
 
 
 class Divider(GObject.GObject):
@@ -57,7 +45,7 @@ class StationHeader(GObject.GObject):
         self.name = name
 
 
-api_key='QPMZ-5J67-9D4T-DWE9'
+api_key='MW9S-E7SL-26DU-VV8V'
 estimate_url = 'http://api.bart.gov/api/etd.aspx?cmd=etd&orig={station}&key={api_key}&json=y'
 
 # style_provider = Gtk.CssProvider()
@@ -81,6 +69,8 @@ estimate_url = 'http://api.bart.gov/api/etd.aspx?cmd=etd&orig={station}&key={api
 class BartappWindow(Gtk.ApplicationWindow):
     __gtype_name__ = 'BartappWindow'
 
+    favs = set()
+
     back_button = GtkTemplate.Child()
     stack = GtkTemplate.Child()
     station_list = GtkTemplate.Child()
@@ -96,19 +86,42 @@ class BartappWindow(Gtk.ApplicationWindow):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        print('window init')
         self.init_template()
+        self.load_prefs()
         
         self.train_list.bind_model(self.train_list_store, self.make_train_widget)
 
         self.station_list.connect('row_activated', self.handle_station_activated)
         self.station_list.set_filter_func(self.filter_station_list, None, False)
+        self.station_list.set_sort_func(self.sort_station_list, None, False)
         for station_dict in STATIONS:
-            self.station_list.add(self.make_station_widget(Station(station_dict)))
+            is_fav = station_dict['abbr'] in self.favs
+            self.station_list.add(self.make_station_widget(Station(station_dict, is_fav)))
         self.station_list.show_all()
             
         self.back_button.connect('clicked', self.handle_back_btn_activate)
         self.station_filter_search.connect('search-changed', self.update_filter)
+
+    def save_prefs(self):
+        dir = GLib.get_user_config_dir()
+        favs_path = path.join(dir, 'favorites')
+        with open(favs_path, 'r+') as f:
+            f.write(','.join(list(self.favs)))
+
+    def load_prefs(self):
+        dir = GLib.get_user_config_dir()
+        favs_path = path.join(dir, 'favorites')
+        if not os.path.exists(favs_path):
+            open(favs_path, 'a').close()
+        else:
+            try:
+                with open(favs_path, 'r') as f:
+                    content = f.read()
+                    if content.strip() != '':
+                        favs = content.strip().split(',')
+                        self.favs = set(favs)
+            except Exception as e:
+                print(e)
 
     def update_filter(self, search_input):
         self.current_filter = search_input.get_text()
@@ -120,6 +133,15 @@ class BartappWindow(Gtk.ApplicationWindow):
             return self.current_filter.lower() in row.station.name.lower()
         else:
             return True
+
+    def sort_station_list(self, row1, row2, data, notif_destroy):
+        if row1.station.abbr in self.favs:
+            return -1
+
+        if row2.station.abbr in self.favs:
+            return 1
+
+        return 0
 
     def make_train_widget(self, data):
         if isinstance(data, Divider):
@@ -167,8 +189,18 @@ class BartappWindow(Gtk.ApplicationWindow):
             print(e)
 
 
+    def update_station_fav(self, abbr):
+        if not abbr in self.favs:
+            self.favs.add(abbr)
+            self.save_prefs()
+            return True
+        else:
+            self.favs.remove(abbr)
+            self.save_prefs()
+            return False
+
     def make_station_widget(self, data):
-        return StationWidget(data) 
+        return StationWidget(data, self.update_station_fav, self.station_list.invalidate_sort)
     
     def handle_station_activated(self, container, widget):
         abbr = widget.station.abbr 

@@ -6,5 +6,7 @@
     <file>line.ui</file>
     <file>platform_divider.ui</file>
     <file>station_header.ui</file>
+    <file>star.png</file>
+    <file>star-o.png</file>
   </gresource>
 </gresources>
