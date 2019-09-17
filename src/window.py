@@ -30,7 +30,6 @@ class Divider(GObject.GObject):
         GObject.GObject.__init__(self)
         self.number = number
 
-
 class Line(GObject.GObject):
     def __init__(self, name, abbrev, estimate):
         GObject.GObject.__init__(self)
@@ -84,12 +83,12 @@ class BartappWindow(Gtk.ApplicationWindow):
     stack = GtkTemplate.Child()
     station_list = GtkTemplate.Child()
     train_list = GtkTemplate.Child()
-    
+
     station_window = GtkTemplate.Child()
     train_window = GtkTemplate.Child()
-    
+
     train_list_store = Gio.ListStore()
-    
+
     station_filter_search = GtkTemplate.Child()
     current_filter = ''
 
@@ -97,7 +96,7 @@ class BartappWindow(Gtk.ApplicationWindow):
         super().__init__(**kwargs)
         self.init_template()
         self.load_prefs()
-        
+
         self.train_list.bind_model(self.train_list_store, self.make_train_widget)
 
         self.station_list.connect('row_activated', self.handle_station_activated)
@@ -107,7 +106,7 @@ class BartappWindow(Gtk.ApplicationWindow):
             is_fav = station_dict['abbr'] in self.favs
             self.station_list.add(self.make_station_widget(Station(station_dict, is_fav)))
         self.station_list.show_all()
-            
+
         self.back_button.connect('clicked', self.handle_back_btn_activate)
         self.station_filter_search.connect('search-changed', self.update_filter)
 
@@ -225,9 +224,9 @@ class BartappWindow(Gtk.ApplicationWindow):
 
     def make_station_widget(self, data):
         return StationWidget(data, self.update_station_fav, self.station_list.invalidate_sort)
-    
+
     def handle_station_activated(self, container, widget):
-        abbr = widget.station.abbr 
+        abbr = widget.station.abbr
         # request data
         self.get_line_estimates(abbr)
         self.stack.set_visible_child(self.train_window)

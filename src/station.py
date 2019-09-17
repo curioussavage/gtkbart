@@ -13,7 +13,7 @@ class Station(Gtk.ListBoxRow):
     def __init__(self, station, update_fav, inval_sort, **kwargs):
         super().__init__(**kwargs)
         self.init_template()
-        
+
         self.update_fav_state = update_fav
         self.inval_sort = inval_sort
         self.station = station
